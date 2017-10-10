@@ -1,0 +1,56 @@
+#
+# This is a test DTS
+#
+study = EMR62242-006
+datatype = Bone and serum markers
+sender = Synarc
+receiver = BMDM
+version = 2.2
+
+columns
+STUDY_ID|Study id|Merck internal study id|regex:/[Ee][Mm][Rr][0-9]+[_][0-9]{3}/|varchar(15)|text|15|0|1|-1|true|EMR62242_006
+CENTER_ID|Center id|The center or site|regex:/[0-9]{3}/|varchar(3)|text|3|0|1|-1|true|002
+SUBJECT_ID|Subject id|The subject|regex:/[0-9]{1,5}/|int|number|5|0|1|-1|true|1203
+SUBJECT_INIT|Subject initials|The subject's initials|regex:/[A-Z]{5}/|varchar(5)|text|5|0|1|-1|true|ABC
+SUBJECT_SEX|Sex|The subject's gender|regex:/[MFU]/|varchar(1)|text|1|0|1|-1|true|ABC
+SUBJECT_DOB|Birth|The subject's birth date|format:/DDMMMYYYY/|varchar(9)|text|9|0|1|-1|true|ABC
+SAMPLE_ID|Sample id|Requisition number / Sample Identifier|regex:/[A-Z][0-9]{6}-[0-9][0-9]/|varchar(10)|text|10|0|1|-1|true|A123456-23
+VISIT_ID|Visit code|Visit identifier|terms:/visitCodes/|varchar(25)|text|25|0|1|-1|true|C7 W19 D1 pre-dose
+SEQ_NUM|Sequence number|Repeat ID value: incremental, 0 for scheduled visits, 1 for first retest…|regex:/[0-9]{3}/|int|number|3|0|1|-1|true|0
+SAMPLE_COL_DATE|Collection date|Sample collection date|format:/DDMMMYYYY/|varchar(9)|text|9|0|1|-1|false|01JAN2011
+SAMPLE_COL_TIME|Collection time|Sample collection time|format:/HH:mm/|varchar(5)|text|5|0|1|-1|false|15:25
+SAMPLE_REMARKS|Sample status|Status/condition of the sample||varchar(100)|text|100|0|1|-1|false|HEMOLYZED UNFROZEN
+ASSAY_TYPE|Assay type|Type (method/techno) of the assay||varchar(30)|text|30|0|1|-1|false|ELISA JAFFE
+ASSAY_NAME|Assay name|Name of the analyte beeing analysed|terms:/biochemicalMarkers/|varchar(20)|text|20|0|1|-1|true|S-BAP
+ASSAY_DATE|Assay date|Date in which the assay was performed (measure date)|format:/DDMMMYYYY/|varchar(9)|text|9|0|1|-1|false|02JAN2011
+ASSAY_KIT|Assay kit|Identifies if different reagent kits have been used between assays. For example if a different batch of antibodies has been used||varchar(50)|text|50|0|1|-1|false|
+ASSAY_PLATEID|Assay plateid|ID of the plate beeing measured or ID of group of samples||varchar(30)|text|30|0|1|-1|false|plate1 plate2
+ASSAY_PROCESSING_OPERATOR|Assay operator|ID of the operator that performs (at least the one who participated the most in) the assay. Can be initials or a number||varchar(20)|text|20|0|1|-1|false|op1 op2 CG
+ASSAY_LLOQ|LLOQ|Lower Limit of Quantification. Could be different between assay batches|regex:/\w+/|float|number|10|0|1|-1|true|2351
+ASSAY_ULOQ|ULOQ|Upper Limit Of Quantification. Could be different between assay batches|regex:/\w+/|float|number|10|0|1|-1|true|8563
+ASSAY_VALUE|Assay value|Numerical result (even if LLOQ or ULOQ). Can be a derived value (e.g. median of technical replicates)|regex:/\w+/|float|number|10|0|1|-1|true|4231
+ASSAY_UNIT|Assay unit|The unit measured||varchar(20)|text|20|0|1|-1|false|ng/mL
+ASSAY_REMARK|Assay remark|Remark on the result, if any. Remarks should use a controlled vocabulary as much as possible (homogeneous wording)||varchar(128)|text|128|0|1|-1|false|AULOQ BLLOQ ASSAY CANCELLED (NOT ENOUGH MATERIAL)
+ASSAY_VALID|Assay valid|Should the measure be used in the analysis, or is there any doubt on the validity of the measure (to described in ASSAY_REMARKS)||varchar(5)|text|5|0|1|-1|false|YES NO
+
+terms visitCodes
+C1 W1 D1 pre-dose|Cycle 1, Week 1, Day 1, pre-dose
+C5 W13 D1 pre-dose|Cycle 5, Week 13, Day 1, pre-dose
+C7 W19 D1 pre-dose|Cycle 7, Week 19, Day 1, pre-dose
+EOT|End of Treatment
+C1 W1 D1 pre-dose OL|Cycle 1, Week 1, Day 1, pre-dose, open labels
+C5 W13 D1 pre-dose OL|Cycle 5, Week 13, Day 1, pre-dose, open labels
+C7 W19 D1 pre-dose OL|Cycle 7, Week 19, Day 1, pre-dose, open labels
+EOT OL|End of Treatment, open labels
+
+terms biochemicalMarkers
+P-OPN|unit:ng/mL;lloq:53.1;uloq:NA*
+S-Bone ALP|unit:ng/mL;lloq:0.28;uloq:115
+S-Total OC|unit:ng/mL;lloq:1.91;uloq:290.8
+U-CREAT|unit:mg/L;lloq:41;uloq:2575
+U-NTX-I|unit:nmol BCE/L;lloq:22;uloq:2900
+U-NTX-I/Creat|unit:nmol BCE/mmol Creat;lloq:NA*;uloq:NA*
+U-DPD|unit:nmol/L;lloq:3.1;uloq:NA*
+U-DPD/Creat|unit:nmol/mmol Creat;lloq:NA*;uloq:NA*
+U-ALPHA-CTX-I|unit:μg/L;lloq:3.6;uloq:NA*
+U-ALPHA-CTX-I/CREAT|unit:μg/mmol CREAT;lloq:NA*;uloq:NA*

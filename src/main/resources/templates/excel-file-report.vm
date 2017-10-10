@@ -1,0 +1,149 @@
+## ########################
+## Excel file report
+## ########################
+#if( !$upload )
+No upload provided. Processing stopped.
+#stop
+#end
+## ########################
+## Prepare workspace
+## ########################
+#set( $saveOutput = true )
+#set( $workspace = $upload.createWorkspace() )
+Start processing upload $dateFormats.format(${upload.getUploaded()},"dd-MMM-yyyy hh:mm:ss") $upload.getMd5sum()
+#set( $dummy = $db.addUploadMessage( $upload, "INFO", $velocityCount, "Upload initiated by ${user.username} using workspace ${workspace}." ) )
+#set( $wsFiles = $workspace.listFiles() )
+Workspace $workspace has been prepared. List of files:
+ ## ########################
+## Examine files
+## ########################
+#foreach( $wsF in $wsFiles )
+#set( $fDate = $dateFormats.format(${wsF.lastModified()},"dd-MMM-yyyy hh:mm:ss") )
+ ${wsF.getName()}       ${wsF.length()} $fDate
+#set( $xlReport = $xls.createExcelFileReport( $wsF ) )
+  File status: $xlReport.getError()
+  Excel version detected: $xlReport.getVersion()
+#set( $dummy = $db.addUploadMessage( $upload, "INFO", $velocityCount, "Reading ${wsF.getName()}, format is ${xlReport.getVersion()}, last modified on $fDate" ) )
+## ########################
+## Examine the sheets
+## ########################
+#set( $xlSheets = $xlReport.getSheets(true) )
+  Number of sheets (including hidden): ${xlSheets.size()}
+#set( $dummy = $db.addUploadMessage( $upload, "INFO", $velocityCount, "${wsF.getName()} contains ${xlSheets.size()} sheet(s)" ) )
+#foreach( $xlSheet in $xlSheets )
+    ---------------------------------------------
+    Sheet ($velocityCount): $xlSheet
+#set( $sheetProps = $xlSheet.getProperties() )
+      First row: $sheetProps.getProperty( "firstRowNum" )  Last row:  $sheetProps.getProperty( "lastRowNum" )  Defined rows:  $sheetProps.getProperty( "physicalNumberOfRows" )
+#set( $emptyRows = $xlSheet.getEmptyRowNums() )
+#if( $emptyRows.size() > 0 )
+      Empty row number(s): $display.truncate( $display.list( $emptyRows ), 60, "..." )
+#end
+#set( $cellLengths = $xlSheet.getCellLengths() )
+#set( $lenKeys = $cellLengths.stringPropertyNames() )
+#foreach( $cellLen in $sorter.sort( $lenKeys ) )
+      Number of rows containing $number.integer( $cellLen ) value(s): $cellLengths.getProperty( $cellLen )
+#end
+      Number of columns: $xlSheet.getColumnCount()
+## ########################
+## Detect header
+## ########################
+#set( $header = $xlSheet.guessHeader() )
+#if( $header.columnCount > 0 )
+      Detected header start: $header.startRow
+      Detected header: $header
+#else
+      No header detected.
+#end
+#if( $header.columnCount != $xlSheet.getColumnCount() )
+      WARNING: Header does not match to number of columns.
+#set( $dummy = $db.addUploadMessage( $upload, "WARN", $velocityCount, "Header does not match to number of columns" ) )
+#end
+## ########################
+## Report styled cells
+## ########################
+#set( $styled = "" )
+#foreach( $row in $xlSheet.getRows() )
+#foreach( $cell in $row )
+#set( $cellStyle = $cell.getCellStyle() )
+#if( $cellStyle.getFillBackgroundColorColor() )
+#set( $styled = "$styled $cell.getAddress()" )
+#elseif( $cellStyle.getFillForegroundColorColor() )
+#set( $styled = "$styled $cell.getAddress()" )
+#end
+#end
+#end
+      Styled cells: $styled
+## ########################
+## Report cell types
+## ########################
+#set( $colNums = [0..$xlSheet.getColumnCount()-1] )
+#foreach( $nCol in $colNums )
+#set( $colRegions = $xlSheet.analyzeCellTypes( $nCol ) )
+#set( $numBlank = 0 )
+#set( $numNumeric = 0 )
+#set( $numFormula = 0 )
+#set( $numString = 0 )
+#set( $blankCells = "Column $nCol type BLANK:" )
+#set( $numericCells = "Column $nCol type NUMERIC:" )
+#set( $stringCells = "Column $nCol type STRING:" )
+#set( $formulaCells = "Column $nCol type FORMULA:" )
+#set( $lastCellType = "" )
+## ########################
+## Report a single and empty column
+## ########################
+#if( $colRegions.size() == 1 )
+#set( $cType = "$colRegions[0].getCellType()" )
+#if( $cType =="BLANK" )
+      WARNING: Column $nCol is empty..
+#set( $dummy = $db.addUploadMessage( $upload, "WARN", $velocityCount, "Column $nCol is empty" ) )
+#end
+#end
+#foreach( $rCol in $colRegions )
+#set( $cType = "$rCol.getCellType()" )
+#if( $lastCellType == "STRING" && $cType == "NUMERIC" )
+      WARNING: Column $nCol cell $rCol.getStartRow() type changes from STRING to NUMERIC..
+#elseif( $lastCellType == "NUMERIC" && $cType == "STRING" )
+      WARNING: Column $nCol cell $rCol.getStartRow() type changes from NUMERIC to STRING.
+#end
+#set( $lastCellType = $cType )
+#if( $cType == "BLANK" )
+#set( $numBlank = $numBlank + 1 )
+#set( $blankCells = "$blankCells [${rCol.getStartRow()}..${rCol.getEndRow()}]" )
+#elseif( $cType == "NUMERIC" )
+#set( $numNumeric = $numNumeric + 1 )
+#set( $numericCells = "$numericCells [${rCol.getStartRow()}..${rCol.getEndRow()}]" )
+#elseif( $cType == "FORMULA" )
+#set( $numFormula = $numFormula + 1 )
+#set( $formulaCells = "$formulaCells [${rCol.getStartRow()}..${rCol.getEndRow()}]" )
+#elseif( $cType == "STRING" )
+#set( $numString = $numString + 1 )
+#set( $stringCells = "$stringCells [${rCol.getStartRow()}..${rCol.getEndRow()}]" )
+#end
+#end
+#if( $numFormula > 0 )
+      WARNING: Column $nCol contains FORMULA.
+#end
+      Column $nCol cells: $numBlank BLANK, $numFormula FORMULA, $numNumeric NUMERIC, $numString STRING. 
+#end
+#end
+## ########################
+## Seperate sheets (if required)
+## ########################
+#if( ${xlSheets.size()}  > 1 )
+#set( $xlFiles = $xls.saveSheets( $wsF, $workspace )  )
+#foreach( $xlF in $xlFiles )
+#set( $xlMime = $extractor.detectMime( $xlF) )
+#set( $dummy = $db.addUploadMessage( $upload, "INFO", $velocityCount, "Storing separate sheet ($xlMime): ${xlF.getName()}" ) )
+#set( $uplOut = $db.appendOutput( $upload, $xlF, $xlMime ) ) 
+#end
+## ########################
+## Write separate text files
+## ########################
+#set( $txtFiles = $xls.saveSheetsAsText( $wsF, $workspace, "csv" )  )
+#foreach( $txtF in $txtFiles )
+#set( $dummy = $db.addUploadMessage( $upload, "INFO", $velocityCount, "Storing sheet as text: ${txtF.getName()}" ) )
+#set( $uplOut = $db.appendOutput( $upload, $txtF, "text/plain" ) ) 
+#end
+#end
+#end

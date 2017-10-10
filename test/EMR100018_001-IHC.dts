@@ -1,0 +1,76 @@
+#
+# This is an IHC DTS
+#
+study = EMR100018-001
+setname = p70S6 IHC 
+datatype = IHC
+sender = Indivumed
+receiver = Merck Biopharma
+version = 1.0
+
+columns
+STUDY|Study|Merck internal study id|regex:/[Ee][Mm][Rr][0-9]+-[0-9]{3}/|varchar(15)|text|15|0|1|-1|true|EMR100018-001
+SUBJID|Subject id|The subject id (incl. site id)|regex:/[0-9]{3}_[0-9]{4}/|varchar(8)|text|8|0|1|-1|true|004_0004
+INDID|Indivumed ID|Indivumed internal sample id||varchar(14)|text|14|0|1|-1|true|MK_RS_0414-001
+SAMPNO|Sample no|The sample identifier|regex:/[A-Z][A-Z][0-9]{1,6}-[0-9]{1,3}/|varchar(20)|text|20|0|1|-1|true|AF174451-8
+TTYPE|Tissue type|Tissue type||varchar(80)|text|1|0|1|-1|true|lung adenocarcinoma
+AB|Antibody (clone)|Antibody used for staining|terms:/antibodies/|varchar(60)|text|60|0|1|-1|true|p-Akt (D9E)
+ISOCON|Isotype control (clone)|Isotype control (clone) related to antibody|terms:/isotypes/|varchar(60)|text|60|0|1|-1|true|RbIgG (DA1E) (pAkt)
+TCONT|Tumor content|Tumor content in percent|regex:/[0-9]{3}/|int|number|3|0|1|-1|true|30
+TC|Tumor cells|Tumor cells|regex:/[0-9]{3}/|int|number|3|0|1|-1|true|30
+POSTC|Positive tumor cells for Ki67|Positive tumor cells for Ki67|regex:/[0-9]{3}/|int|number|3|0|1|-1|true|90
+TCNNEG|Tumor cells - Nucleus negative 0|Tumor cells - Nucleus negative 0|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCNWEAK|Tumor cells - Nucleus weak 1|Tumor cells - Nucleus weak 1|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCNMOD|Tumor cells - Nucleus moderate 2|Tumor cells - Nucleus moderate 2|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCNSTR|Tumor cells - Nucleus strong 3|Tumor cells - Nucleus strong 3|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCNHS|Tumor cells - Nucleus H-Score|Tumor cells - Nucleus H-Score|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|150 or n/a
+TCMNEG|Tumor cells - Membrane negative 0|Tumor cells - Membrane negative 0|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCMWEAK|Tumor cells - Membrane weak 1|Tumor cells - Membrane weak 1|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCMMOD|Tumor cells - Membrane moderate 2|Tumor cells - Membrane moderate 2|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCMSTR|Tumor cells - Membrane strong 3|Tumor cells - Membrane strong 3|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCMHS|Tumor cells - Membrane H-Score|Tumor cells - Membrane H-Score|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|150 or n/a
+TCCNEG|Tumor cells - Cytoplasm negative 0|Tumor cells - Cytoplasm negative 0|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCCWEAK|Tumor cells - Cytoplasm weak 1|Tumor cells - Cytoplasm weak 1|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCCMOD|Tumor cells - Cytoplasm moderate 2|Tumor cells - Cytoplasm moderate 2|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCCSTR|Tumor cells - Cytoplasm strong 3|Tumor cells - Cytoplasm strong 3|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|20 or n/a
+TCCHS|Tumor cells - Cytoplasm H-Score|Tumor cells - Cytoplasm H-Score|regex:/[0-9]{3}/terms:/na/|varchar(3)|text|3|0|1|-1|true|150 or n/a
+PRESUBCOM|Predominant subcellular compartment|Predominant subcellular compartment|terms:/compartments/|varchar(5)|text|5|0|1|-1|true|c/m
+STPAT|Staining pattern|Staining pattern|terms:/stainingPatterns/|varchar(50)|text|50|0|1|-1|true|heterogenous
+COMMENT|Comment|Remark on the result, if any||varchar(254)|text|254|0|1|-1|false|unsufficient tumor content, staining cancelled
+EVALDAT|Evaluation date|Evaluation date|format:/DD-MMM-YYYY/|varchar(12)|text|12|0|1|-1|true|12-DEC-2016
+EVALOP|Evaluation operator|Evaluation operator|regex:/[A-Za-z]{3}/|varchar(3)|text|3|0|1|-1|true|vEn
+
+terms antibodies
+p-Akt (D9E)|p-Akt (D9E)
+CD45 (LCA)|CD45 (LCA)
+CD45 (2B11 & PD/7/26)|CD45 (2B11 & PD/7/26)
+Ki67 (30-9)|Ki67 (30-9)
+p-p44/42 MAPK (D13.14.4E)|p-p44/42 MAPK (D13.14.4E)
+p-PRAS40 (D4D2)|p-PRAS40 (D4D2)
+p-S6 (D68F8)|p-S6 (D68F8)
+
+terms isotypes
+RbIgG (DA1E) (pAkt)|RbIgG (DA1E) (pAkt)
+RbIgG (DA1E) (Ki67)|RbIgG (DA1E) (Ki67)
+MsIgG1kappa (DAK-G01) (CD45)|MsIgG1kappa (DAK-G01) (CD45)
+
+terms na
+n/a|n/a
+NA|n/a
+na|n/a
+|n/a
+
+terms compartments
+c|c
+m|m
+n|n
+c/n|c/n
+n/c|n/c
+c/m|c/m
+m/c|m/c
+m/n|m/n
+n/m|n/m
+
+terms stainingPatterns
+heterogenous|heterogenous
+homogenous|homogenous

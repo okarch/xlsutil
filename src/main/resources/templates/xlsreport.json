@@ -1,0 +1,55 @@
+{
+ "templatename":"Excel file report",
+ "template":"
+## ########################\\n
+## Excel file report\\n
+## ########################\\n
+#if( !$upload )\\n
+No upload provided. Processing stopped.\\n
+#stop\\n
+#end\\n
+## ########################\\n
+## Prepare workspace\\n
+## ########################\\n
+#set( $saveOutput = true )\\n
+#set( $workspace = $upload.createWorkspace() )\\n
+Start processing upload $dateFormats.format(${upload.getUploaded()},\"dd-MMM-yyyy hh:mm:ss\") $upload.getMd5sum()\\n
+#set( $dummy = $db.addUploadMessage( $upload, \"INFO\", \"Upload initiated by ${user.username} using workspace ${workspace}.\" ) )\\n
+#set( $wsFiles = $workspace.listFiles() )\\n
+Workspace $workspace has been prepared. List of files:\\n 
+## ########################\\n
+## Examine files\\n
+## ########################\\n
+#foreach( $wsF in $wsFiles )\\n
+#set( $fDate = $dateFormats.format(${wsF.lastModified()},\"dd-MMM-yyyy hh:mm:ss\") )\\n
+ ${wsF.getName()}\t${wsF.length()}\t$fDate\\n
+#set( $xlReport = $xls.createExcelFileReport( $wsF ) )\\n
+  File status: $xlReport.getError()\\n
+  Excel version detected: $xlReport.getVersion()\\n
+#set( $dummy = $db.addUploadMessage( $upload, \"INFO\", \"Reading ${ws.getName()}, format is ${xlReport.getVersion()}, last modified on $fDate\" ) )\\n
+## ########################\\n
+## Examine the sheets\\n
+## ########################\\n
+#set( $xlSheets = $xlReport.getSheets(true) )\\n
+  Number of sheets (including hidden): ${xlSheets.size()}\\n
+#set( $dummy = $db.addUploadMessage( $upload, \"INFO\", \"${ws.getName()} contains ${xlSheets.size()} sheet(s)\" ) )\\n
+#foreach( $xlSheet in $xlSheets )\\n
+    ---------------------------------------------\\n
+    Sheet ($velocityCount): $xlSheet\\n
+#set( $sheetProps = $xlSheet.getProperties() )\\n
+      First row: $sheetProps.getProperty( \"firstRowNum\" )\\n
+      Last row:  $sheetProps.getProperty( \"lastRowNum\" )\\n
+      Defined rows:  $sheetProps.getProperty( \"physicalNumberOfRows\" )\\n
+#set( $emptyRows = $xlSheet.getEmptyRowNums() )\\n
+      Number of empty rows: $emptyRows.size()\\n
+#if( $emptyRows.size() > 0 )\\n
+      Empty row number(s): $display.truncate( $display.list( $emptyRows ), 60, \"...\" )\\n  
+#end\\n
+#set( $cellLengths = $xlSheet.getCellLengths() )\\n
+#set( $lenKeys = $cellLengths.stringPropertyNames() )\\n
+#foreach( $cellLen in $sorter.sort( $lenKeys ) )\\n
+      Number of Rows containing $number.integer( $cellLen ) value(s): $cellLengths.getProperty( $cellLen )\\n
+#end\\n
+#end\\n
+#end\\n"
+}

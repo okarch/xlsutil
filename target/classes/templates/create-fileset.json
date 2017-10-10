@@ -1,0 +1,30 @@
+{
+ "templatename":"Create fileset",
+ "template":"
+## ########################\\n
+## Create a fileset\\n
+## ########################\\n
+#if( !$upload )\\n
+No fileset provided. Stopped processing.\\n
+#stop\\n
+#end\\n
+## ########################\\n
+## Investigate fileset\\n
+## ########################\\n
+Start processing fileset: $upload.getMd5sum() initiated by ${user.username} (${user.userid})\\n
+#set( $dummy = $db.addUploadMessage( $upload, \"INFO\", \"Fileset processing initiated by ${user.username}.\" ) )\\n
+Fileset name: $upload.getFilename()\\n
+Fileset mime-type: $upload.getMime()\\n
+Fileset created: $dateFormats.format(${upload.getUploaded()},\"dd-MMM-yyyy hh:mm:ss\")\\n
+Fileset userid: $upload.getUserid()\\n
+## ########################\\n
+## Examine files\\n
+## ########################\\n
+#set( $updList = $db.findFilesByFileset( $upload.getUploadid() ) )\\n
+Number of files in this set: $updList.size()\\n
+#set( $dummy = $db.addUploadMessage( $upload, \"INFO\", \"Fileset ${upload.getFilename()} contains $updList.size() file(s).\" ) )\\n
+File listing:\\n
+#foreach( $updBatch in $updList )\\n
+ $updBatch.getMime()\t$updBatch.getMime()\t$dateFormats.format(${upload.getUploaded()},\"dd-MMM-yyyy hh:mm:ss\")\t$updBatch.getFilename()\\n
+#end\\n"
+}
